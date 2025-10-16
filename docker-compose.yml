@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: cloudops-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clouddeck
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cloudops-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: cloudops-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - cloudops-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Go Backend API
+  backend:
+    build:
+      context: ./applications/backend
+      dockerfile: Dockerfile
+    container_name: cloudops-backend
+    environment:
+      - PORT=8080
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=clouddeck
+      - MONGO_URI=mongodb://mongodb:27017
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - cloudops-network
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./applications/frontend
+      dockerfile: Dockerfile
+    container_name: cloudops-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - cloudops-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  mongodb_data:
+    driver: local
+
+networks:
+  cloudops-network:
+    driver: bridge

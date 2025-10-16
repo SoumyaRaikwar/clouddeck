@@ -1,0 +1,6 @@
+# applications/backend/.dockerignore
+.git
+.env
+*.log
+tmp/
+node_modules/
