@@ -8,6 +8,7 @@ import Tasks from './pages/Tasks';
 import Containers from './pages/Containers'; 
 import GitHub from './pages/GitHub';
 import Kubernetes from './pages/Kubernetes';
+import CICD from './pages/CICD';
 
 const theme = createTheme({
   palette: {
@@ -34,6 +35,7 @@ function App() {
           <Route path="/containers" element={<Containers />} />
           <Route path="/github" element={<GitHub />} />
           <Route path="/kubernetes" element={<Kubernetes />} />
+          <Route path="/cicd" element={<CICD />} />
         </Routes>
       </Router>
     </ThemeProvider>

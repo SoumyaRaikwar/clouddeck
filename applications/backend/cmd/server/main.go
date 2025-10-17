@@ -120,7 +120,7 @@ func main() {
 			}
 		}
 	}
-	
+
 	// Kubernetes Integration
 k8sService, err := services.NewKubernetesService()
 if err == nil {
@@ -136,6 +136,17 @@ if err == nil {
 	}
 } else {
 	log.Printf("⚠️  Kubernetes client not available: %v", err)
+}
+
+// CI/CD Pipeline (inside api group)
+cicdService := services.NewCICDService("")
+cicdHandler := handlers.NewCICDHandler(cicdService)
+
+cicd := api.Group("/cicd")
+{
+	cicd.GET("/runs", cicdHandler.GetWorkflowRuns)
+	cicd.GET("/stats", cicdHandler.GetPipelineStats)
+	cicd.GET("/workflows", cicdHandler.GetWorkflows)
 }
 
 	// Start server

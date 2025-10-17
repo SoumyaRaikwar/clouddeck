@@ -6,6 +6,7 @@ import { Task, CreateTaskRequest } from '../types/task';
 import { Container, ContainerLogs } from '../types/container';
 import { GitHubPR, GitHubIssue, SyncPRsRequest, SyncIssuesRequest } from '../types/github';
 import { Pod, Deployment, Service, Namespace } from '../types/kubernetes';
+import { WorkflowRun, PipelineStats, Workflow } from '../types/cicd';
 
 
 const apiClient = axios.create({
@@ -166,4 +167,45 @@ export const getK8sPodLogs = async (namespace: string, podName: string, lines: n
     `/kubernetes/pods/${namespace}/${podName}/logs?lines=${lines}`
   );
   return response.data.data?.logs || '';
+};
+
+// ==================== CI/CD Pipeline (NEW) ====================
+export const getWorkflowRuns = async (
+  token: string,
+  owner: string,
+  repo: string,
+  limit: number = 20
+): Promise<WorkflowRun[]> => {
+  const response = await apiClient.get<ApiResponse<WorkflowRun[]>>(
+    `/cicd/runs?token=${token}&owner=${owner}&repo=${repo}&limit=${limit}`
+  );
+  return response.data.data || [];
+};
+
+export const getPipelineStats = async (
+  token: string,
+  owner: string,
+  repo: string
+): Promise<PipelineStats> => {
+  const response = await apiClient.get<ApiResponse<PipelineStats>>(
+    `/cicd/stats?token=${token}&owner=${owner}&repo=${repo}`
+  );
+  return response.data.data || {
+    total_runs: 0,
+    successful_runs: 0,
+    failed_runs: 0,
+    success_rate: 0,
+    avg_duration: '0m 0s',
+  };
+};
+
+export const getWorkflows = async (
+  token: string,
+  owner: string,
+  repo: string
+): Promise<Workflow[]> => {
+  const response = await apiClient.get<ApiResponse<Workflow[]>>(
+    `/cicd/workflows?token=${token}&owner=${owner}&repo=${repo}`
+  );
+  return response.data.data || [];
 };
