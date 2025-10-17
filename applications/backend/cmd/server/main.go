@@ -120,6 +120,23 @@ func main() {
 			}
 		}
 	}
+	
+	// Kubernetes Integration
+k8sService, err := services.NewKubernetesService()
+if err == nil {
+	k8sHandler := handlers.NewKubernetesHandler(k8sService)
+	
+	k8s := api.Group("/kubernetes")
+	{
+		k8s.GET("/pods", k8sHandler.GetPods)
+		k8s.GET("/deployments", k8sHandler.GetDeployments)
+		k8s.GET("/services", k8sHandler.GetServices)
+		k8s.GET("/namespaces", k8sHandler.GetNamespaces)
+		k8s.GET("/pods/:namespace/:pod/logs", k8sHandler.GetPodLogs)
+	}
+} else {
+	log.Printf("⚠️  Kubernetes client not available: %v", err)
+}
 
 	// Start server
 	port := os.Getenv("PORT")
