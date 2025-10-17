@@ -7,6 +7,7 @@ import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
 import Containers from './pages/Containers'; 
 import GitHub from './pages/GitHub';
+import Kubernetes from './pages/Kubernetes';
 
 const theme = createTheme({
   palette: {
@@ -32,6 +33,7 @@ function App() {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/containers" element={<Containers />} />
           <Route path="/github" element={<GitHub />} />
+          <Route path="/kubernetes" element={<Kubernetes />} />
         </Routes>
       </Router>
     </ThemeProvider>

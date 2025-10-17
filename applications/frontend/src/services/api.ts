@@ -5,6 +5,7 @@ import { Project, CreateProjectRequest } from '../types/project';
 import { Task, CreateTaskRequest } from '../types/task';
 import { Container, ContainerLogs } from '../types/container';
 import { GitHubPR, GitHubIssue, SyncPRsRequest, SyncIssuesRequest } from '../types/github';
+import { Pod, Deployment, Service, Namespace } from '../types/kubernetes';
 
 
 const apiClient = axios.create({
@@ -137,4 +138,32 @@ export const syncPRsToTasks = async (data: SyncPRsRequest): Promise<void> => {
 
 export const syncIssuesToTasks = async (data: SyncIssuesRequest): Promise<void> => {
   await apiClient.post('/github/sync-issues', data);
+};
+
+//  Kubernetes 
+export const getK8sPods = async (namespace: string = 'all'): Promise<Pod[]> => {
+  const response = await apiClient.get<ApiResponse<Pod[]>>(`/kubernetes/pods?namespace=${namespace}`);
+  return response.data.data || [];
+};
+
+export const getK8sDeployments = async (namespace: string = 'all'): Promise<Deployment[]> => {
+  const response = await apiClient.get<ApiResponse<Deployment[]>>(`/kubernetes/deployments?namespace=${namespace}`);
+  return response.data.data || [];
+};
+
+export const getK8sServices = async (namespace: string = 'all'): Promise<Service[]> => {
+  const response = await apiClient.get<ApiResponse<Service[]>>(`/kubernetes/services?namespace=${namespace}`);
+  return response.data.data || [];
+};
+
+export const getK8sNamespaces = async (): Promise<Namespace[]> => {
+  const response = await apiClient.get<ApiResponse<Namespace[]>>('/kubernetes/namespaces');
+  return response.data.data || [];
+};
+
+export const getK8sPodLogs = async (namespace: string, podName: string, lines: number = 100): Promise<string> => {
+  const response = await apiClient.get<ApiResponse<{ logs: string }>>(
+    `/kubernetes/pods/${namespace}/${podName}/logs?lines=${lines}`
+  );
+  return response.data.data?.logs || '';
 };

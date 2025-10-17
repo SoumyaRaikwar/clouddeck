@@ -6,7 +6,8 @@ import {
   Folder as FolderIcon,
   Assignment as TaskIcon,
   ViewModule as ContainerIcon,
-   GitHub as GitHubIcon
+  GitHub as GitHubIcon,
+  CloudQueue as K8sIcon,
 } from '@mui/icons-material';
 
 const Navbar: React.FC = () => {
@@ -19,6 +20,7 @@ const Navbar: React.FC = () => {
     { label: 'Tasks', path: '/tasks', icon: <TaskIcon /> },
     { label: 'Containers', path: '/containers', icon: <ContainerIcon /> },
     { label: 'GitHub', path: '/github', icon: <GitHubIcon /> },
+    { label: 'Kubernetes', path: '/kubernetes', icon: <K8sIcon /> },
   ];
 
   return (
