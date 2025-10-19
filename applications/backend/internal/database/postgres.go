@@ -14,6 +14,7 @@ import (
 )
 
 var PostgresDB *gorm.DB
+var DB *gorm.DB  // <-- ADD THIS ALIAS
 
 // InitPostgres initializes PostgreSQL connection
 func InitPostgres() error {
@@ -38,6 +39,9 @@ func InitPostgres() error {
 		return fmt.Errorf("failed to connect to PostgreSQL: %w", err)
 	}
 
+	// Set the alias
+	DB = PostgresDB  // <-- ADD THIS LINE
+
 	// Configure connection pool
 	sqlDB, err := PostgresDB.DB()
 	if err != nil {
@@ -51,13 +55,14 @@ func InitPostgres() error {
 
 	// Auto migrate models
 	if err := PostgresDB.AutoMigrate(
-	&models.Item{}, 
-	&models.Project{}, 
-	&models.Task{},
-	&models.Container{},
-); err != nil {
-	return fmt.Errorf("failed to migrate database: %w", err)
-}
+		&models.Item{},
+		&models.Project{},
+		&models.Task{},
+		&models.Container{},
+		&models.GitOpsApp{}, // <-- ADD THIS
+	); err != nil {
+		return fmt.Errorf("failed to migrate database: %w", err)
+	}
 	log.Println("✅ PostgreSQL connected successfully")
 	return nil
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/SoumyaRaikwar/clouddeck-backend/internal/database"
 	"github.com/SoumyaRaikwar/clouddeck-backend/internal/handlers"
 	"github.com/SoumyaRaikwar/clouddeck-backend/internal/middleware"
+	"github.com/SoumyaRaikwar/clouddeck-backend/internal/models" 
 	"github.com/SoumyaRaikwar/clouddeck-backend/internal/repositories"
 	"github.com/SoumyaRaikwar/clouddeck-backend/internal/services"
 )
@@ -32,6 +33,7 @@ func main() {
 	} else {
 		defer database.CloseMongoDB()
 	}
+database.DB.AutoMigrate(&models.GitOpsApp{})
 
 	// Initialize Gin router
 	router := gin.Default()
@@ -137,6 +139,18 @@ if err == nil {
 } else {
 	log.Printf("⚠️  Kubernetes client not available: %v", err)
 }
+
+	gitopsService := services.NewGitOpsService(database.DB)
+		gitopsHandler := handlers.NewGitOpsHandler(gitopsService)
+
+		gitops := api.Group("/gitops")
+		{
+			gitops.POST("/apps", gitopsHandler.CreateApp)
+			gitops.GET("/apps", gitopsHandler.GetAllApps)
+			gitops.GET("/apps/:id", gitopsHandler.GetApp)
+			gitops.POST("/apps/:id/sync", gitopsHandler.SyncApp)
+			gitops.DELETE("/apps/:id", gitopsHandler.DeleteApp)
+		}
 
 // CI/CD Pipeline (inside api group)
 cicdService := services.NewCICDService("")

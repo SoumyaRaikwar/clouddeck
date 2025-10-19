@@ -8,7 +8,8 @@ import {
   ViewModule as ContainerIcon,
   GitHub as GitHubIcon,
   CloudQueue as K8sIcon,
-  Timeline as CICDIcon 
+  Timeline as CICDIcon,
+  Rocket as GitOpsIcon, 
 } from '@mui/icons-material';
 
 const Navbar: React.FC = () => {
@@ -23,6 +24,7 @@ const Navbar: React.FC = () => {
     { label: 'GitHub', path: '/github', icon: <GitHubIcon /> },
     { label: 'Kubernetes', path: '/kubernetes', icon: <K8sIcon /> },
     { label: 'CI/CD', path: '/cicd', icon: <CICDIcon /> },
+    { label: 'GitOps', path: '/gitops', icon: <GitOpsIcon /> }, 
   ];
 
   return (

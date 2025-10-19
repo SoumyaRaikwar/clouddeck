@@ -7,6 +7,7 @@ import { Container, ContainerLogs } from '../types/container';
 import { GitHubPR, GitHubIssue, SyncPRsRequest, SyncIssuesRequest } from '../types/github';
 import { Pod, Deployment, Service, Namespace } from '../types/kubernetes';
 import { WorkflowRun, PipelineStats, Workflow } from '../types/cicd';
+import { GitOpsApp, CreateGitOpsAppRequest } from '../types/gitops';
 
 
 const apiClient = axios.create({
@@ -198,6 +199,31 @@ export const getPipelineStats = async (
     avg_duration: '0m 0s',
   };
 };
+
+// ==================== GitOps ====================
+export const getAllGitOpsApps = async (): Promise<GitOpsApp[]> => {
+  const response = await apiClient.get<ApiResponse<GitOpsApp[]>>('/gitops/apps');
+  return response.data.data || [];
+};
+
+export const getGitOpsApp = async (id: number): Promise<GitOpsApp> => {
+  const response = await apiClient.get<ApiResponse<GitOpsApp>>(`/gitops/apps/${id}`);
+  return response.data.data as GitOpsApp;
+};
+
+export const createGitOpsApp = async (data: CreateGitOpsAppRequest): Promise<GitOpsApp> => {
+  const response = await apiClient.post<ApiResponse<GitOpsApp>>('/gitops/apps', data);
+  return response.data.data as GitOpsApp;
+};
+
+export const syncGitOpsApp = async (id: number): Promise<void> => {
+  await apiClient.post(`/gitops/apps/${id}/sync`);
+};
+
+export const deleteGitOpsApp = async (id: number): Promise<void> => {
+  await apiClient.delete(`/gitops/apps/${id}`);
+};
+
 
 export const getWorkflows = async (
   token: string,
